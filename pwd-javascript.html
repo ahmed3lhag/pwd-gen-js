@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ahmed Elhag - Password Generator (JS)</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="pwd-javascript.css">
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="logo">Ahmed <span>Elhag</span></div>
+    </header>
+
+    <!-- Subheader -->
+    <div class="subheader">
+        <h3>Password Generator with JavaScript</h3>
+        <span class="language-logo"></span>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="container">
+            <h2>Password Generator</h2>
+            <input type="number" id="char_count" placeholder="Enter password length (min 6)" min="6" required>
+            <button id="generate-btn" onclick="generatePassword()">
+                <span id="btn-text">Generate Password</span>
+                <span id="spinner" class="spinner"></span>
+            </button>
+            <div id="output"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-social">
+            <a href="https://github.com/ahmed3lhag" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i></a>
+            <a href="https://linkedin.com/in/ahmed3lhag" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i></a>
+            <a href="https://x.com/ahmed3lhag" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-twitter"></i></a>
+            <a href="https://t.me/ahmed3lhag" class="footer-social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-telegram"></i></a>
+        </div>
+        <p class="copyright">© <span id="year"></span> Ahmed Elhag. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Set the current year in the footer
+        document.getElementById("year").innerText = new Date().getFullYear();
+
+        function generatePassword() {
+            const charCount = document.getElementById("char_count").value;
+            const outputDiv = document.getElementById("output");
+            const generateBtn = document.getElementById("generate-btn");
+            const btnText = document.getElementById("btn-text");
+            const spinner = document.getElementById("spinner");
+
+            // Reset output and show loading state
+            outputDiv.innerText = "";
+            outputDiv.classList.remove("error");
+            generateBtn.disabled = true;
+            btnText.innerText = "Generating...";
+            spinner.style.display = "inline-block";
+
+            // Validate input
+            if (!charCount || charCount < 6) {
+                outputDiv.classList.add("error");
+                outputDiv.innerText = "Please enter a number >= 6";
+                generateBtn.disabled = false;
+                btnText.innerText = "Generate Password";
+                spinner.style.display = "none";
+                return;
+            }
+
+            try {
+                // Define character sets
+                const s1 = "abcdefghijklmnopqrstuvwxyz".split(""); // Lowercase
+                const s2 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split(""); // Uppercase
+                const s3 = "0123456789".split("");               // Digits
+                const s4 = "!@#$%^&*()_+-=[]{}|;:,.<>?".split(""); // Punctuation
+
+                // Shuffle function
+                const shuffle = (array) => {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                    return array;
+                };
+
+                // Shuffle character sets
+                shuffle(s1);
+                shuffle(s2);
+                shuffle(s3);
+                shuffle(s4);
+
+                // Calculate parts
+                const charactersNumbers = parseInt(charCount);
+                const part1 = Math.round(charactersNumbers * 30 / 100); // 30% for lowercase and uppercase
+                const part2 = Math.round(charactersNumbers * 20 / 100); // 20% for digits and punctuation
+
+                // Create password
+                let password = [];
+                password.push(...s1.slice(0, part1)); // Lowercase
+                password.push(...s2.slice(0, part1)); // Uppercase
+                password.push(...s3.slice(0, part2)); // Digits
+                password.push(...s4.slice(0, part2)); // Punctuation
+
+                // Ensure the password has the required length
+                if (password.length < charactersNumbers) {
+                    const additionalChars = charactersNumbers - password.length;
+                    const allChars = [...s1, ...s2, ...s3, ...s4];
+                    shuffle(allChars);
+                    password.push(...allChars.slice(0, additionalChars));
+                }
+
+                // Trim if too long
+                password = password.slice(0, charactersNumbers);
+
+                // Final shuffle
+                shuffle(password);
+
+                // Convert to string
+                const finalPassword = password.join("");
+
+                // Display the password
+                outputDiv.innerText = `Generated Password: ${finalPassword}`;
+            } catch (error) {
+                outputDiv.classList.add("error");
+                outputDiv.innerText = `Error: ${error.message}`;
+            } finally {
+                // Reset button state
+                generateBtn.disabled = false;
+                btnText.innerText = "Generate Password";
+                spinner.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
